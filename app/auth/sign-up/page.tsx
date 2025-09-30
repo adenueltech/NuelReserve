@@ -51,6 +51,9 @@ export default function SignUpPage() {
   return (
     <div className="flex min-h-screen w-full items-center justify-center p-6">
       <div className="w-full max-w-md">
+        <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8">
+          ← Back to Home
+        </Link>
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold tracking-tight">NuelReserve</h1>
           <p className="mt-2 text-muted-foreground">Create your account to get started</p>

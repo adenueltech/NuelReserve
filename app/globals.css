@@ -123,3 +123,111 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Custom animations for enhanced landing page */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes bounce-gentle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  @keyframes rotate-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8); }
+  }
+
+  @keyframes slide-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-in-left {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes particle-float {
+    0% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+  }
+
+  .animate-float { animation: float 3s ease-in-out infinite; }
+  .animate-bounce-gentle { animation: bounce-gentle 2s ease-in-out infinite; }
+  .animate-rotate-slow { animation: rotate-slow 20s linear infinite; }
+  .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+  .animate-slide-in-up { animation: slide-in-up 0.8s ease-out; }
+  .animate-slide-in-left { animation: slide-in-left 0.8s ease-out; }
+  .animate-slide-in-right { animation: slide-in-right 0.8s ease-out; }
+  .animate-gradient-shift { animation: gradient-shift 8s ease infinite; }
+  .animate-particle-float { animation: particle-float 10s linear infinite; }
+
+  /* Background animation utilities */
+  .bg-animated-gradient {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+  }
+
+  .floating-shapes::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    width: 20px;
+    height: 20px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 50%;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  .floating-shapes::after {
+    content: '';
+    position: absolute;
+    top: 60%;
+    right: 15%;
+    width: 15px;
+    height: 15px;
+    background: rgba(236, 72, 153, 0.1);
+    border-radius: 50%;
+    animation: float 5s ease-in-out infinite reverse;
+  }
+}

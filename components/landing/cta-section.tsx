@@ -6,33 +6,34 @@ import { ArrowRight, Sparkles } from "lucide-react"
 
 export function CTASection() {
   return (
-    <section className="relative overflow-hidden py-12 sm:py-16 md:py-24 lg:py-32">
-      <div className="absolute inset-0 animate-gradient bg-gradient-to-br from-primary/10 via-accent/10 to-primary/10"></div>
-      <div className="container relative mx-auto px-4">
-        <div className="animate-fadeInUp mx-auto max-w-3xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary sm:mb-6 sm:px-4 sm:py-2 sm:text-sm">
-            <Sparkles className="size-3 sm:size-4" />
+    <section className="relative overflow-hidden py-16 sm:py-20 md:py-28 lg:py-36 floating-shapes">
+      <div className="absolute inset-0 bg-animated-gradient opacity-10"></div>
+      <div className="absolute inset-0 animate-gradient bg-gradient-to-br from-primary/15 via-accent/15 to-primary/15"></div>
+      <div className="container relative mx-auto px-6">
+        <div className="animate-slide-in-up mx-auto max-w-4xl text-center">
+          <div className="animate-bounce-gentle mb-6 inline-flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-base font-medium text-primary sm:mb-8 sm:px-6 sm:py-4 sm:text-lg">
+            <Sparkles className="size-5 sm:size-6 animate-rotate-slow" />
             <span>Start Your Journey Today</span>
           </div>
-          <h2 className="mb-4 text-balance text-3xl font-bold tracking-tight sm:mb-6 sm:text-4xl md:text-5xl lg:text-6xl">
+          <h2 className="animate-pulse-glow mb-6 text-balance text-4xl font-bold tracking-tight sm:mb-8 sm:text-5xl md:text-6xl lg:text-7xl">
             Ready to Experience Effortless Booking?
           </h2>
-          <p className="mb-8 text-pretty text-base text-muted-foreground sm:mb-10 sm:text-lg md:text-xl">
+          <p className="mb-10 text-pretty text-lg text-muted-foreground sm:mb-12 sm:text-xl md:text-2xl">
             Join thousands of users and providers who trust NuelReserve. Create your free account in seconds and start
             booking or offering services today.
           </p>
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-            <Button asChild size="lg" className="group w-full sm:w-auto">
-              <Link href="/auth/sign-up">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
+            <Button asChild size="lg" className="animate-float group w-full sm:w-auto shadow-xl hover:shadow-2xl">
+              <Link href="/get-started">
                 Get Started Free
-                <ArrowRight className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="ml-2 size-5 transition-transform group-hover:translate-x-2" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto bg-transparent">
-              <Link href="/auth/sign-up">Become a Provider</Link>
+            <Button asChild size="lg" variant="outline" className="animate-bounce-gentle w-full sm:w-auto bg-transparent hover:bg-primary/10">
+              <Link href="/get-started">Become a Provider</Link>
             </Button>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground sm:mt-6 sm:text-sm">
+          <p className="animate-slide-in-up mt-6 text-sm text-muted-foreground sm:mt-8 sm:text-base">
             No credit card required • Free forever • Cancel anytime
           </p>
         </div>
