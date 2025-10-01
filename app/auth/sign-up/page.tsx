@@ -32,7 +32,7 @@ export default function SignUpPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/verify-email`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/auth/verify-email`,
           data: {
             full_name: fullName,
             user_role: userRole,
