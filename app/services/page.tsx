@@ -1,91 +1,70 @@
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
+"use client"
+
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 import { ServiceCard } from "@/components/service-card"
 import { ServiceFilters } from "@/components/service-filters"
 import { NotificationBell } from "@/components/notification-bell"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { Menu, X } from "lucide-react"
 
-export default async function ServicesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    category?: string;
-    search?: string;
-    sort?: string;
-    minPrice?: string;
-    maxPrice?: string;
-  }>
-}) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export default function ServicesPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [services, setServices] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
+
+  const supabase = createClient()
+
+  useEffect(() => {
+    loadServices()
+  }, [])
+
+  const loadServices = async () => {
+    try {
+      const { data: { user: userData } } = await supabase.auth.getUser()
+      if (!userData) {
+        window.location.href = "/auth/login"
+        return
+      }
+      setUser(userData)
+
+      // Build query with ratings
+      let query = supabase
+        .from("services")
+        .select(
+          `
+          *,
+          provider:profiles!services_provider_id_fkey(id, full_name, email),
+          reviews!left(rating)
+        `,
+        )
+        .eq("is_active", true)
+
+      const { data: servicesData } = await query.order("created_at", { ascending: false })
+      setServices(servicesData || [])
+    } catch (error) {
+      console.error("Error loading services:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading services...</p>
+        </div>
+      </div>
+    )
+  }
 
   if (!user) {
-    redirect("/auth/login")
+    return null
   }
-
-  const params = await searchParams
-  const category = params.category
-  const search = params.search
-  const sort = params.sort || "created_at"
-  const minPrice = params.minPrice
-  const maxPrice = params.maxPrice
-
-  // Build query with ratings
-  let query = supabase
-    .from("services")
-    .select(
-      `
-      *,
-      provider:profiles!services_provider_id_fkey(id, full_name, email),
-      reviews!left(rating)
-    `,
-    )
-    .eq("is_active", true)
-
-  if (category) {
-    query = query.eq("category", category)
-  }
-
-  if (search) {
-    query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
-  }
-
-  if (minPrice) {
-    query = query.gte("price", parseFloat(minPrice))
-  }
-
-  if (maxPrice) {
-    query = query.lte("price", parseFloat(maxPrice))
-  }
-
-  // Handle sorting
-  let orderBy = "created_at"
-  let ascending = false
-
-  switch (sort) {
-    case "price_asc":
-      orderBy = "price"
-      ascending = true
-      break
-    case "price_desc":
-      orderBy = "price"
-      ascending = false
-      break
-    case "rating":
-      // For rating sort, we'll sort by services that have reviews first
-      // This is a simplified approach - in production you'd want proper rating aggregation
-      orderBy = "created_at"
-      ascending = false
-      break
-    default:
-      orderBy = "created_at"
-      ascending = false
-  }
-
-  const { data: services } = await query.order(orderBy, { ascending })
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -114,7 +93,51 @@ export default async function ServicesPage({
               </Button>
             </form>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="flex items-center justify-center rounded-lg p-2 transition-colors hover:bg-muted md:hidden"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="border-t border-border/40 bg-card/95 backdrop-blur-lg md:hidden">
+            <nav className="container mx-auto flex flex-col gap-1 px-4 py-4">
+              <Button asChild variant="ghost" className="justify-start">
+                <Link href="/messages" onClick={() => setMobileMenuOpen(false)}>
+                  Messages
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" className="justify-start">
+                <Link href="/favorites" onClick={() => setMobileMenuOpen(false)}>
+                  Favorites
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" className="justify-start">
+                <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>
+                  Profile
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" className="justify-start">
+                <Link href="/bookings" onClick={() => setMobileMenuOpen(false)}>
+                  My Bookings
+                </Link>
+              </Button>
+              <div className="mt-4 border-t border-border/40 pt-4">
+                <form action="/auth/logout" method="post">
+                  <Button type="submit" variant="outline" className="w-full">
+                    Logout
+                  </Button>
+                </form>
+              </div>
+            </nav>
+          </div>
+        )}
       </header>
 
       <main className="flex-1">
