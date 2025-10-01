@@ -92,21 +92,24 @@ export default async function ServicesPage({
       <header className="border-b border-border bg-card">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link href="/services">
-            <h1 className="text-2xl font-bold">NuelReserve</h1>
+            <h1 className="text-lg md:text-2xl font-bold">NuelReserve</h1>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 md:gap-4">
             <NotificationBell />
-            <Button asChild variant="ghost">
+            <Button asChild variant="ghost" size="sm" className="hidden sm:flex text-xs md:text-sm">
+              <Link href="/messages">Messages</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
               <Link href="/favorites">Favorites</Link>
             </Button>
-            <Button asChild variant="ghost">
+            <Button asChild variant="ghost" size="sm" className="hidden md:flex text-xs md:text-sm">
               <Link href="/profile">Profile</Link>
             </Button>
-            <Button asChild variant="ghost">
-              <Link href="/bookings">My Bookings</Link>
+            <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
+              <Link href="/bookings">Bookings</Link>
             </Button>
             <form action="/auth/logout" method="post">
-              <Button type="submit" variant="outline">
+              <Button type="submit" variant="outline" size="sm" className="text-xs md:text-sm">
                 Logout
               </Button>
             </form>
@@ -115,19 +118,19 @@ export default async function ServicesPage({
       </header>
 
       <main className="flex-1">
-        <div className="container mx-auto px-6 py-8">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold tracking-tight">Discover Services</h2>
-            <p className="mt-2 text-muted-foreground">Browse and book from our trusted service providers</p>
+        <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
+          <div className="mb-6 md:mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Discover Services</h2>
+            <p className="mt-2 text-sm md:text-base text-muted-foreground">Browse and book from our trusted service providers</p>
           </div>
 
           <ServiceFilters />
 
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 md:mt-8 grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {services && services.length > 0 ? (
               services.map((service) => <ServiceCard key={service.id} service={service} />)
             ) : (
-              <div className="col-span-full py-12 text-center">
+              <div className="col-span-full py-8 md:py-12 text-center">
                 <p className="text-muted-foreground">No services found. Try adjusting your filters.</p>
               </div>
             )}

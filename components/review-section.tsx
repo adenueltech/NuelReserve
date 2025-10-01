@@ -1,6 +1,6 @@
-"use client"
+ "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -29,35 +29,43 @@ export function ReviewSection({ serviceId, userId, providerId, canReview }: Revi
   const supabase = createClient()
 
   // Fetch reviews on mount
-  useState(() => {
+  useEffect(() => {
     fetchReviews()
-  })
+  }, [])
 
   const fetchReviews = async () => {
-    const { data, error } = await supabase
-      .from("reviews")
-      .select(`
-        *,
-        user:profiles(id, full_name)
-      `)
-      .eq("service_id", serviceId)
-      .order("created_at", { ascending: false })
+    try {
+      console.log("Fetching reviews for service:", serviceId)
+      const { data, error } = await supabase
+        .from("reviews")
+        .select(`
+          *,
+          user:profiles!inner(id, full_name)
+        `)
+        .eq("service_id", serviceId)
+        .order("created_at", { ascending: false })
 
-    if (error) {
-      console.error("Error fetching reviews:", error)
-      return
+      if (error) {
+        console.error("Error fetching reviews:", error)
+        setIsLoading(false)
+        return
+      }
+
+      console.log("Reviews data:", data)
+      const reviewsWithUsers = data as ReviewWithUser[]
+      setReviews(reviewsWithUsers)
+
+      if (reviewsWithUsers.length > 0) {
+        const avg = reviewsWithUsers.reduce((sum, review) => sum + review.rating, 0) / reviewsWithUsers.length
+        setAverageRating(avg)
+        setReviewCount(reviewsWithUsers.length)
+      }
+
+      setIsLoading(false)
+    } catch (err) {
+      console.error("Unexpected error in fetchReviews:", err)
+      setIsLoading(false)
     }
-
-    const reviewsWithUsers = data as ReviewWithUser[]
-    setReviews(reviewsWithUsers)
-
-    if (reviewsWithUsers.length > 0) {
-      const avg = reviewsWithUsers.reduce((sum, review) => sum + review.rating, 0) / reviewsWithUsers.length
-      setAverageRating(avg)
-      setReviewCount(reviewsWithUsers.length)
-    }
-
-    setIsLoading(false)
   }
 
   const submitReview = async () => {

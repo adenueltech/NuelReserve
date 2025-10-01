@@ -30,6 +30,13 @@ export function AvailabilityForm({ serviceId, providerId }: AvailabilityFormProp
     setIsLoading(true)
     setError(null)
 
+    // Validate that end time is after start time
+    if (formData.start_time >= formData.end_time) {
+      setError("End time must be after start time")
+      setIsLoading(false)
+      return
+    }
+
     try {
       const supabase = createClient()
 

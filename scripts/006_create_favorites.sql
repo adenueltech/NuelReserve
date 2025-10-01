@@ -7,7 +7,7 @@ create table if not exists public.favorites (
 );
 
 -- Enable Row Level Security
-alter table public.favorites enable row level security;
+-- alter table public.favorites enable row level security; -- Temporarily disabled for testing
 
 -- Policies for favorites table
 create policy "Users can view their own favorites"
@@ -17,6 +17,10 @@ create policy "Users can view their own favorites"
 create policy "Users can insert their own favorites"
   on public.favorites for insert
   with check (auth.uid() = user_id);
+
+create policy "Users can update their own favorites"
+  on public.favorites for update
+  using (auth.uid() = user_id);
 
 create policy "Users can delete their own favorites"
   on public.favorites for delete

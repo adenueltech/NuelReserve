@@ -16,13 +16,57 @@ interface MessagingProps {
   otherUser: Profile
 }
 
-export function Messaging({ bookingId, currentUserId, otherUser }: MessagingProps) {
+export function Messaging({ bookingId, currentUserId, otherUser: initialOtherUser }: MessagingProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
+  const [otherUser, setOtherUser] = useState(initialOtherUser)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
+
+  // Fetch other user data if not provided
+  useEffect(() => {
+    if (!initialOtherUser && bookingId) {
+      // Try to fetch provider from booking
+      fetchBookingProvider()
+    } else {
+      setOtherUser(initialOtherUser)
+    }
+  }, [initialOtherUser, bookingId])
+
+  const fetchBookingProvider = async () => {
+    if (!bookingId) return
+
+    const { data: booking } = await supabase
+      .from("bookings")
+      .select(`
+        user:profiles!bookings_user_id_fkey!inner(id, full_name, email),
+        provider:profiles!bookings_provider_id_fkey!inner(id, full_name, email)
+      `)
+      .eq("id", bookingId)
+      .single()
+
+    if (booking) {
+      // Determine which user is the "other" user (not current user)
+      const other = (booking.user as any).id === currentUserId ? (booking.provider as any) : (booking.user as any)
+      setOtherUser(other)
+    }
+  }
+
+  // Handle case where otherUser is still null
+  if (!otherUser) {
+    return (
+      <Card>
+        <CardContent className="py-8">
+          <div className="text-center text-muted-foreground">
+            <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p>Loading messaging...</p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -38,22 +82,42 @@ export function Messaging({ bookingId, currentUserId, otherUser }: MessagingProp
   }, [messages])
 
   useEffect(() => {
+    if (!otherUser?.id) return
+
     // Subscribe to real-time messages
     const unsubscribe = realtimeService.subscribeToMessages(currentUserId, (message) => {
-      if (message.booking_id === bookingId) {
+      // For pre-booking messages, check if it's between these two users
+      const isRelevantMessage = bookingId
+        ? message.booking_id === bookingId
+        : (message.sender_id === otherUser.id || message.receiver_id === otherUser.id) &&
+          (message.sender_id === currentUserId || message.receiver_id === currentUserId)
+
+      if (isRelevantMessage) {
         setMessages(prev => [...prev, message])
       }
     })
 
     return unsubscribe
-  }, [currentUserId, bookingId])
+  }, [currentUserId, bookingId, otherUser?.id])
 
   const fetchMessages = async () => {
-    const { data, error } = await supabase
+    if (!otherUser?.id) return
+
+    let query = supabase
       .from("messages")
       .select("*")
-      .eq("booking_id", bookingId)
       .order("created_at", { ascending: true })
+
+    if (bookingId) {
+      // For booking-specific messages
+      query = query.eq("booking_id", bookingId)
+    } else {
+      // For pre-booking messages between these users
+      query = query.or(`and(sender_id.eq.${currentUserId},receiver_id.eq.${otherUser.id}),and(sender_id.eq.${otherUser.id},receiver_id.eq.${currentUserId})`)
+        .is("booking_id", null)
+    }
+
+    const { data, error } = await query
 
     if (error) {
       console.error("Error fetching messages:", error)
@@ -65,17 +129,23 @@ export function Messaging({ bookingId, currentUserId, otherUser }: MessagingProp
   }
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || isSending) return
+    if (!newMessage.trim() || isSending || !otherUser?.id) return
 
     setIsSending(true)
+    const messageData: any = {
+      sender_id: currentUserId,
+      receiver_id: otherUser.id,
+      content: newMessage.trim(),
+    }
+
+    // Only include booking_id if it exists
+    if (bookingId) {
+      messageData.booking_id = bookingId
+    }
+
     const { error } = await supabase
       .from("messages")
-      .insert({
-        sender_id: currentUserId,
-        receiver_id: otherUser.id,
-        booking_id: bookingId,
-        content: newMessage.trim(),
-      })
+      .insert(messageData)
 
     if (error) {
       console.error("Error sending message:", error)

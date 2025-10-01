@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
+import { AnalyticsCharts } from "@/components/analytics-charts"
 
 export default async function ProviderDashboardPage() {
   const supabase = await createClient()
@@ -114,23 +114,26 @@ export default async function ProviderDashboardPage() {
       <header className="border-b border-border bg-card">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link href="/provider/dashboard">
-            <h1 className="text-2xl font-bold">NuelReserve Provider</h1>
+            <h1 className="text-lg md:text-2xl font-bold">NuelReserve Provider</h1>
           </Link>
-          <div className="flex items-center gap-4">
-            <Button asChild variant="ghost">
+          <div className="flex items-center gap-2 md:gap-4">
+            <Button asChild variant="ghost" size="sm" className="hidden sm:flex">
               <Link href="/profile">Profile</Link>
             </Button>
-            <Button asChild variant="ghost">
-              <Link href="/provider/services">My Services</Link>
+            <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
+              <Link href="/provider/services">Services</Link>
             </Button>
-            <Button asChild variant="ghost">
+            <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
+              <Link href="/messages">Messages</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/provider/customers">Customers</Link>
             </Button>
-            <Button asChild variant="ghost">
+            <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
               <Link href="/provider/bookings">Bookings</Link>
             </Button>
             <form action="/auth/logout" method="post">
-              <Button type="submit" variant="outline">
+              <Button type="submit" variant="outline" size="sm" className="text-xs md:text-sm">
                 Logout
               </Button>
             </form>
@@ -145,13 +148,13 @@ export default async function ProviderDashboardPage() {
             <p className="mt-2 text-muted-foreground">Welcome back, {profile?.full_name || "Provider"}</p>
           </div>
 
-          <div className="mb-8 grid gap-4 md:grid-cols-4">
+          <div className="mb-8 grid gap-4 grid-cols-2 md:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+                <div className="text-xl md:text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">Last 30 days</p>
               </CardContent>
             </Card>
@@ -160,7 +163,7 @@ export default async function ProviderDashboardPage() {
                 <CardTitle className="text-sm font-medium">Total Services</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{totalServices || 0}</div>
+                <div className="text-xl md:text-2xl font-bold">{totalServices || 0}</div>
                 <p className="text-xs text-muted-foreground">Active service offerings</p>
               </CardContent>
             </Card>
@@ -169,7 +172,7 @@ export default async function ProviderDashboardPage() {
                 <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{totalBookings || 0}</div>
+                <div className="text-xl md:text-2xl font-bold">{totalBookings || 0}</div>
                 <p className="text-xs text-muted-foreground">All time bookings</p>
               </CardContent>
             </Card>
@@ -178,58 +181,14 @@ export default async function ProviderDashboardPage() {
                 <CardTitle className="text-sm font-medium">Pending Bookings</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{pendingBookings || 0}</div>
+                <div className="text-xl md:text-2xl font-bold">{pendingBookings || 0}</div>
                 <p className="text-xs text-muted-foreground">Awaiting confirmation</p>
               </CardContent>
             </Card>
           </div>
 
           {/* Analytics Charts */}
-          <div className="mb-8 grid gap-8 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Revenue Trends</CardTitle>
-                <CardDescription>Monthly revenue for the last 30 days</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => [`$${value}`, 'Revenue']} />
-                    <Bar dataKey="revenue" fill="#3b82f6" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Booking Status Distribution</CardTitle>
-                <CardDescription>Breakdown of booking statuses</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
+          <AnalyticsCharts chartData={chartData} pieData={pieData} />
 
           <div className="grid gap-8 lg:grid-cols-2">
             <Card>

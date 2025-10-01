@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { BookingForm } from "@/components/booking-form"
 import { ReviewSection } from "@/components/review-section"
+import { Messaging } from "@/components/messaging"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { MessageCircle } from "lucide-react"
 
 export default async function ServiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
@@ -25,7 +28,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     .select(
       `
       *,
-      provider:profiles!services_provider_id_fkey(id, full_name, email, phone)
+      provider:profiles!services_provider_id_fkey!inner(id, full_name, email, phone)
     `,
     )
     .eq("id", id)
@@ -68,80 +71,101 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       <header className="border-b border-border bg-card">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link href="/services">
-            <h1 className="text-2xl font-bold">NuelReserve</h1>
+            <h1 className="text-lg md:text-2xl font-bold">NuelReserve</h1>
           </Link>
-          <Button asChild variant="ghost">
+          <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
             <Link href="/services">Back to Services</Link>
           </Button>
         </div>
       </header>
 
       <main className="flex-1">
-        <div className="container mx-auto px-6 py-8">
-          <div className="grid gap-8 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-3xl">{service.title}</CardTitle>
-                      <CardDescription className="mt-2">
-                        Provided by {service.provider?.full_name || "Unknown Provider"}
-                      </CardDescription>
-                    </div>
-                    <Badge variant="secondary" className="text-lg">
-                      ${service.price}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <h3 className="mb-2 font-semibold">Description</h3>
-                    <p className="text-muted-foreground">{service.description || "No description provided."}</p>
-                  </div>
+        <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
+          <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
+            <div className="lg:col-span-2 order-2 lg:order-1">
+              <Tabs defaultValue="details" className="space-y-4 md:space-y-6">
+                <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+                  <TabsTrigger value="details" className="text-xs md:text-sm">Details</TabsTrigger>
+                  <TabsTrigger value="reviews" className="text-xs md:text-sm">Reviews</TabsTrigger>
+                  <TabsTrigger value="message" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
+                    <MessageCircle className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden sm:inline">Message</span>
+                    <span className="sm:hidden">Msg</span>
+                  </TabsTrigger>
+                </TabsList>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <h3 className="mb-2 font-semibold">Category</h3>
-                      <Badge>{service.category}</Badge>
-                    </div>
-                    <div>
-                      <h3 className="mb-2 font-semibold">Duration</h3>
-                      <p className="text-muted-foreground">{service.duration_minutes} minutes</p>
-                    </div>
-                    {service.location && (
-                      <div className="sm:col-span-2">
-                        <h3 className="mb-2 font-semibold">Location</h3>
-                        <p className="text-muted-foreground">{service.location}</p>
+                <TabsContent value="details" className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <div className="flex-1">
+                          <CardTitle className="text-2xl md:text-3xl">{service.title}</CardTitle>
+                          <CardDescription className="mt-2">
+                            Provided by {service.provider?.full_name || "Unknown Provider"}
+                          </CardDescription>
+                        </div>
+                        <Badge variant="secondary" className="text-base md:text-lg self-start">
+                          ${service.price}
+                        </Badge>
                       </div>
-                    )}
-                  </div>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div>
+                        <h3 className="mb-2 font-semibold">Description</h3>
+                        <p className="text-muted-foreground">{service.description || "No description provided."}</p>
+                      </div>
 
-                  <div>
-                    <h3 className="mb-2 font-semibold">Provider Contact</h3>
-                    <p className="text-sm text-muted-foreground">{service.provider?.email}</p>
-                    {service.provider?.phone && (
-                      <p className="text-sm text-muted-foreground">{service.provider.phone}</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <h3 className="mb-2 font-semibold">Category</h3>
+                          <Badge>{service.category}</Badge>
+                        </div>
+                        <div>
+                          <h3 className="mb-2 font-semibold">Duration</h3>
+                          <p className="text-muted-foreground">{service.duration_minutes} minutes</p>
+                        </div>
+                        {service.location && (
+                          <div className="sm:col-span-2">
+                            <h3 className="mb-2 font-semibold">Location</h3>
+                            <p className="text-muted-foreground">{service.location}</p>
+                          </div>
+                        )}
+                      </div>
 
-              {/* Reviews Section */}
-              <div className="mt-8">
-                <ReviewSection
-                  serviceId={id}
-                  userId={user.id}
-                  providerId={service.provider_id}
-                  canReview={canReview}
-                />
-              </div>
+                      <div>
+                        <h3 className="mb-2 font-semibold">Provider Contact</h3>
+                        <p className="text-sm text-muted-foreground">{service.provider?.email}</p>
+                        {service.provider?.phone && (
+                          <p className="text-sm text-muted-foreground">{service.provider.phone}</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="reviews">
+                  <ReviewSection
+                    serviceId={id}
+                    userId={user.id}
+                    providerId={service.provider_id}
+                    canReview={canReview}
+                  />
+                </TabsContent>
+
+                <TabsContent value="message">
+                  <Messaging
+                    bookingId="" // Empty for pre-booking messages
+                    currentUserId={user.id}
+                    otherUser={service.provider}
+                  />
+                </TabsContent>
+              </Tabs>
             </div>
 
-            <div>
+            <div className="order-1 lg:order-2">
               <Card>
                 <CardHeader>
-                  <CardTitle>Book This Service</CardTitle>
+                  <CardTitle className="text-lg md:text-xl">Book This Service</CardTitle>
                   <CardDescription>Select an available time slot</CardDescription>
                 </CardHeader>
                 <CardContent>

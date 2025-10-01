@@ -14,20 +14,25 @@ export default async function FavoritesPage() {
     redirect("/auth/login")
   }
 
-  // Get user's favorites with service details
-  const { data: favorites } = await supabase
+  // Get user's favorite service IDs first
+  const { data: favoriteRecords } = await supabase
     .from("favorites")
-    .select(`
-      service:services(
-        *,
-        provider:profiles!services_provider_id_fkey(id, full_name, email),
-        reviews!left(rating)
-      )
-    `)
+    .select("service_id")
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
 
-  const services = favorites?.map(fav => fav.service).filter(Boolean) || []
+  const favoriteServiceIds = favoriteRecords?.map(fav => fav.service_id) || []
+
+  // Get services that are favorited
+  const { data: services } = await supabase
+    .from("services")
+    .select(`
+      *,
+      provider:profiles!services_provider_id_fkey(id, full_name, email),
+      reviews!left(rating)
+    `)
+    .in("id", favoriteServiceIds)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -62,7 +67,7 @@ export default async function FavoritesPage() {
             <p className="mt-2 text-muted-foreground">Services you've saved for later</p>
           </div>
 
-          {services.length === 0 ? (
+          {(services || []).length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground mb-4">You haven't favorited any services yet.</p>
               <Button asChild>
@@ -71,7 +76,7 @@ export default async function FavoritesPage() {
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {services.map((service) => (
+              {(services || []).map((service) => (
                 <ServiceCard key={service.id} service={service} />
               ))}
             </div>

@@ -39,7 +39,7 @@ export default async function ProviderCustomersPage() {
 
   // Group by customer
   const customerMap = customers?.reduce((acc, booking) => {
-    const customerId = booking.user.id
+    const customerId = (booking.user as any).id
     if (!acc[customerId]) {
       acc[customerId] = {
         ...booking.user,
