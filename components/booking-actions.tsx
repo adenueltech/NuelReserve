@@ -17,27 +17,33 @@ export function BookingActions({ booking }: BookingActionsProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleStatusChange = async (newStatus: string) => {
-    const confirmMessages = {
-      confirmed: "Are you sure you want to confirm this booking?",
-      cancelled: "Are you sure you want to cancel this booking?",
-      completed: "Are you sure you want to mark this booking as completed?",
-    }
-
-    if (!confirm(confirmMessages[newStatus as keyof typeof confirmMessages])) {
-      return
-    }
-
+    console.log("Attempting to change booking status to:", newStatus, "for booking ID:", booking.id)
     setIsLoading(true)
 
     try {
       const supabase = createClient()
-      const { error } = await supabase.from("bookings").update({ status: newStatus }).eq("id", booking.id)
 
-      if (error) throw error
+      // First check if user is authenticated
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) {
+        console.error("Authentication error:", authError)
+        throw new Error("User not authenticated")
+      }
 
+      console.log("User authenticated:", user.id)
+
+      const { data, error } = await supabase.from("bookings").update({ status: newStatus }).eq("id", booking.id)
+
+      if (error) {
+        console.error("Supabase error:", error)
+        throw error
+      }
+
+      console.log("Booking updated successfully:", data)
       router.refresh()
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to update booking")
+      console.error("Failed to update booking:", err)
+      // You could add a toast notification here instead of alert
     } finally {
       setIsLoading(false)
     }
