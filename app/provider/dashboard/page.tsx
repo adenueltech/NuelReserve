@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 
 export default async function ProviderDashboardPage() {
   const supabase = await createClient()
@@ -64,6 +65,50 @@ export default async function ProviderDashboardPage() {
     .eq("provider_id", user.id)
     .eq("status", "pending")
 
+  // Get revenue data for the last 30 days
+  const thirtyDaysAgo = new Date()
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+  const { data: revenueData } = await supabase
+    .from("bookings")
+    .select("total_price, created_at, status")
+    .eq("provider_id", user.id)
+    .eq("status", "completed")
+    .gte("created_at", thirtyDaysAgo.toISOString())
+
+  // Calculate total revenue
+  const totalRevenue = revenueData?.reduce((sum, booking) => sum + booking.total_price, 0) || 0
+
+  // Get monthly revenue data for chart
+  const monthlyRevenue = revenueData?.reduce((acc, booking) => {
+    const month = new Date(booking.created_at).toLocaleDateString('en-US', { month: 'short' })
+    acc[month] = (acc[month] || 0) + booking.total_price
+    return acc
+  }, {} as Record<string, number>)
+
+  const chartData = Object.entries(monthlyRevenue || {}).map(([month, revenue]) => ({
+    month,
+    revenue
+  }))
+
+  // Get booking status distribution
+  const { data: bookingStatuses } = await supabase
+    .from("bookings")
+    .select("status")
+    .eq("provider_id", user.id)
+
+  const statusCounts = bookingStatuses?.reduce((acc, booking) => {
+    acc[booking.status] = (acc[booking.status] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  const pieData = [
+    { name: 'Completed', value: statusCounts?.completed || 0, color: '#10b981' },
+    { name: 'Pending', value: statusCounts?.pending || 0, color: '#f59e0b' },
+    { name: 'Confirmed', value: statusCounts?.confirmed || 0, color: '#3b82f6' },
+    { name: 'Cancelled', value: statusCounts?.cancelled || 0, color: '#ef4444' },
+  ].filter(item => item.value > 0)
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-border bg-card">
@@ -73,7 +118,13 @@ export default async function ProviderDashboardPage() {
           </Link>
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost">
+              <Link href="/profile">Profile</Link>
+            </Button>
+            <Button asChild variant="ghost">
               <Link href="/provider/services">My Services</Link>
+            </Button>
+            <Button asChild variant="ghost">
+              <Link href="/provider/customers">Customers</Link>
             </Button>
             <Button asChild variant="ghost">
               <Link href="/provider/bookings">Bookings</Link>
@@ -88,13 +139,22 @@ export default async function ProviderDashboardPage() {
       </header>
 
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-6 py-8">
           <div className="mb-8">
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
             <p className="mt-2 text-muted-foreground">Welcome back, {profile?.full_name || "Provider"}</p>
           </div>
 
-          <div className="mb-8 grid gap-4 md:grid-cols-3">
+          <div className="mb-8 grid gap-4 md:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+                <p className="text-xs text-muted-foreground">Last 30 days</p>
+              </CardContent>
+            </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Services</CardTitle>
@@ -120,6 +180,53 @@ export default async function ProviderDashboardPage() {
               <CardContent>
                 <div className="text-2xl font-bold">{pendingBookings || 0}</div>
                 <p className="text-xs text-muted-foreground">Awaiting confirmation</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Analytics Charts */}
+          <div className="mb-8 grid gap-8 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue Trends</CardTitle>
+                <CardDescription>Monthly revenue for the last 30 days</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => [`$${value}`, 'Revenue']} />
+                    <Bar dataKey="revenue" fill="#3b82f6" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Booking Status Distribution</CardTitle>
+                <CardDescription>Breakdown of booking statuses</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>

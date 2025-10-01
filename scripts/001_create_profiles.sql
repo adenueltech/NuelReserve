@@ -6,6 +6,12 @@ create table if not exists public.profiles (
   full_name text,
   phone text,
   user_role text not null check (user_role in ('user', 'provider')),
+  bio text,
+  website text,
+  instagram text,
+  twitter text,
+  linkedin text,
+  portfolio_images text[],
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -17,6 +23,17 @@ alter table public.profiles enable row level security;
 create policy "Users can view their own profile"
   on public.profiles for select
   using (auth.uid() = id);
+
+create policy "Users can view provider profiles for active services"
+  on public.profiles for select
+  using (
+    user_role = 'provider' and
+    exists (
+      select 1 from public.services
+      where services.provider_id = profiles.id
+      and services.is_active = true
+    )
+  );
 
 create policy "Users can update their own profile"
   on public.profiles for update

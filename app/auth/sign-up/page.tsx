@@ -32,7 +32,7 @@ export default function SignUpPage() {
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/verify-email`,
           data: {
             full_name: fullName,
             user_role: userRole,
@@ -49,7 +49,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-6">
+    <div className="flex min-h-screen w-full items-center justify-center px-4 py-6 md:px-8 lg:px-16">
       <div className="w-full max-w-md">
         <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8">
           ← Back to Home

@@ -44,25 +44,23 @@ export function BookingForm({ service, availability, userId }: BookingFormProps)
     setError(null)
 
     try {
-      const slot = availability.find((s) => s.id === selectedSlot)
-      if (!slot) throw new Error("Invalid time slot")
-
-      const supabase = createClient()
-
-      const { error: bookingError } = await supabase.from("bookings").insert({
-        user_id: userId,
-        service_id: service.id,
-        provider_id: service.provider_id,
-        availability_id: slot.id,
-        booking_date: slot.date,
-        start_time: slot.start_time,
-        end_time: slot.end_time,
-        total_price: service.price,
-        notes: notes || null,
-        status: "pending",
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          service_id: service.id,
+          availability_id: selectedSlot,
+          notes: notes || null,
+        }),
       })
 
-      if (bookingError) throw bookingError
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create booking")
+      }
 
       router.push("/bookings?success=true")
       router.refresh()

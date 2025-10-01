@@ -2,13 +2,20 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { ServiceCard } from "@/components/service-card"
 import { ServiceFilters } from "@/components/service-filters"
+import { NotificationBell } from "@/components/notification-bell"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 export default async function ServicesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; search?: string }>
+  searchParams: Promise<{
+    category?: string;
+    search?: string;
+    sort?: string;
+    minPrice?: string;
+    maxPrice?: string;
+  }>
 }) {
   const supabase = await createClient()
   const {
@@ -22,14 +29,18 @@ export default async function ServicesPage({
   const params = await searchParams
   const category = params.category
   const search = params.search
+  const sort = params.sort || "created_at"
+  const minPrice = params.minPrice
+  const maxPrice = params.maxPrice
 
-  // Build query
+  // Build query with ratings
   let query = supabase
     .from("services")
     .select(
       `
       *,
-      provider:profiles!services_provider_id_fkey(id, full_name, email)
+      provider:profiles!services_provider_id_fkey(id, full_name, email),
+      reviews!left(rating)
     `,
     )
     .eq("is_active", true)
@@ -42,7 +53,39 @@ export default async function ServicesPage({
     query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
   }
 
-  const { data: services } = await query.order("created_at", { ascending: false })
+  if (minPrice) {
+    query = query.gte("price", parseFloat(minPrice))
+  }
+
+  if (maxPrice) {
+    query = query.lte("price", parseFloat(maxPrice))
+  }
+
+  // Handle sorting
+  let orderBy = "created_at"
+  let ascending = false
+
+  switch (sort) {
+    case "price_asc":
+      orderBy = "price"
+      ascending = true
+      break
+    case "price_desc":
+      orderBy = "price"
+      ascending = false
+      break
+    case "rating":
+      // For rating sort, we'll sort by services that have reviews first
+      // This is a simplified approach - in production you'd want proper rating aggregation
+      orderBy = "created_at"
+      ascending = false
+      break
+    default:
+      orderBy = "created_at"
+      ascending = false
+  }
+
+  const { data: services } = await query.order(orderBy, { ascending })
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -52,6 +95,13 @@ export default async function ServicesPage({
             <h1 className="text-2xl font-bold">NuelReserve</h1>
           </Link>
           <div className="flex items-center gap-4">
+            <NotificationBell />
+            <Button asChild variant="ghost">
+              <Link href="/favorites">Favorites</Link>
+            </Button>
+            <Button asChild variant="ghost">
+              <Link href="/profile">Profile</Link>
+            </Button>
             <Button asChild variant="ghost">
               <Link href="/bookings">My Bookings</Link>
             </Button>
@@ -65,7 +115,7 @@ export default async function ServicesPage({
       </header>
 
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-6 py-8">
           <div className="mb-8">
             <h2 className="text-3xl font-bold tracking-tight">Discover Services</h2>
             <p className="mt-2 text-muted-foreground">Browse and book from our trusted service providers</p>

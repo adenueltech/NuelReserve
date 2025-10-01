@@ -9,7 +9,7 @@ export function CTASection() {
     <section className="relative overflow-hidden py-16 sm:py-20 md:py-28 lg:py-36 floating-shapes">
       <div className="absolute inset-0 bg-animated-gradient opacity-10"></div>
       <div className="absolute inset-0 animate-gradient bg-gradient-to-br from-primary/15 via-accent/15 to-primary/15"></div>
-      <div className="container relative mx-auto px-6">
+      <div className="container relative mx-auto px-8">
         <div className="animate-slide-in-up mx-auto max-w-4xl text-center">
           <div className="animate-bounce-gentle mb-6 inline-flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-base font-medium text-primary sm:mb-8 sm:px-6 sm:py-4 sm:text-lg">
             <Sparkles className="size-5 sm:size-6 animate-rotate-slow" />

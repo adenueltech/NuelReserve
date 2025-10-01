@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { BookingForm } from "@/components/booking-form"
+import { ReviewSection } from "@/components/review-section"
 
 export default async function ServiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createClient()
@@ -50,6 +51,18 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     .order("date", { ascending: true })
     .order("start_time", { ascending: true })
 
+  // Check if user can review this service (has completed booking)
+  const { data: completedBooking } = await supabase
+    .from("bookings")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("service_id", id)
+    .eq("status", "completed")
+    .limit(1)
+    .single()
+
+  const canReview = !!completedBooking
+
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-border bg-card">
@@ -64,7 +77,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       </header>
 
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-6 py-8">
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
               <Card>
@@ -113,6 +126,16 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Reviews Section */}
+              <div className="mt-8">
+                <ReviewSection
+                  serviceId={id}
+                  userId={user.id}
+                  providerId={service.provider_id}
+                  canReview={canReview}
+                />
+              </div>
             </div>
 
             <div>

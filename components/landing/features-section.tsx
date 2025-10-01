@@ -39,7 +39,7 @@ export function FeaturesSection() {
 
   return (
     <section id="features" className="scroll-mt-16 border-b border-border/40 py-12 sm:py-16 md:py-24 lg:py-32">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-8">
         <div className="animate-fadeInUp mx-auto mb-12 max-w-3xl text-center sm:mb-16">
           <h2 className="mb-4 text-balance text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
             Everything you need to book with confidence
