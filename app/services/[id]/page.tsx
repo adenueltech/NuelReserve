@@ -85,9 +85,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
             <div className="lg:col-span-2 order-2 lg:order-1">
               <Tabs defaultValue="details" className="space-y-4 md:space-y-6">
                 <TabsList className="grid w-full grid-cols-3 h-auto p-1">
-                  <TabsTrigger value="details" className="text-xs md:text-sm">Details</TabsTrigger>
-                  <TabsTrigger value="reviews" className="text-xs md:text-sm">Reviews</TabsTrigger>
-                  <TabsTrigger value="message" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm">
+                  <TabsTrigger value="details" className="text-xs md:text-sm text-foreground">Details</TabsTrigger>
+                  <TabsTrigger value="reviews" className="text-xs md:text-sm text-foreground">Reviews</TabsTrigger>
+                  <TabsTrigger value="message" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm text-foreground">
                     <MessageCircle className="h-3 w-3 md:h-4 md:w-4" />
                     <span className="hidden sm:inline">Message</span>
                     <span className="sm:hidden">Msg</span>

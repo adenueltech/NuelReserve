@@ -78,13 +78,13 @@ export default function ServicesPage() {
             <Button asChild variant="ghost" size="sm" className="hidden sm:flex text-xs md:text-sm">
               <Link href="/messages">Messages</Link>
             </Button>
-            <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
+            <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/favorites">Favorites</Link>
             </Button>
-            <Button asChild variant="ghost" size="sm" className="hidden md:flex text-xs md:text-sm">
+            <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/profile">Profile</Link>
             </Button>
-            <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
+            <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/bookings">Bookings</Link>
             </Button>
             <form action="/auth/logout" method="post">

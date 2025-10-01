@@ -40,7 +40,7 @@ export function ReviewSection({ serviceId, userId, providerId, canReview }: Revi
         .from("reviews")
         .select(`
           *,
-          user:profiles!inner(id, full_name)
+          user:profiles(id, full_name)
         `)
         .eq("service_id", serviceId)
         .order("created_at", { ascending: false })

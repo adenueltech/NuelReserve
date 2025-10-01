@@ -61,7 +61,7 @@ export function Messaging({ bookingId, currentUserId, otherUser: initialOtherUse
         <CardContent className="py-8">
           <div className="text-center text-muted-foreground">
             <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p>Loading messaging...</p>
+            <p>Unable to load messaging. Provider information is not available.</p>
           </div>
         </CardContent>
       </Card>
