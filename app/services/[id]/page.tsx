@@ -28,7 +28,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     .select(
       `
       *,
-      provider:profiles!services_provider_id_fkey!inner(id, full_name, email, phone)
+      provider:profiles!services_provider_id_fkey(id, full_name, email, phone)
     `,
     )
     .eq("id", id)

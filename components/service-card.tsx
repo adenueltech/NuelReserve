@@ -41,9 +41,9 @@ export function ServiceCard({ service }: { service: ServiceWithProvider }) {
         .select("id")
         .eq("user_id", user.id)
         .eq("service_id", service.id)
-        .single()
+        .limit(1)
 
-      setIsFavorited(!!data)
+      setIsFavorited(!!data && data.length > 0)
     } catch (error) {
       // Not favorited or error
       setIsFavorited(false)

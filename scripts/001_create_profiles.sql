@@ -24,16 +24,9 @@ create policy "Users can view their own profile"
   on public.profiles for select
   using (auth.uid() = id);
 
-create policy "Users can view provider profiles for active services"
+create policy "Users can view provider profiles"
   on public.profiles for select
-  using (
-    user_role = 'provider' and
-    exists (
-      select 1 from public.services
-      where services.provider_id = profiles.id
-      and services.is_active = true
-    )
-  );
+  using (user_role = 'provider');
 
 create policy "Users can update their own profile"
   on public.profiles for update

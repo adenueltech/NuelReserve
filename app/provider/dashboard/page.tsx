@@ -176,16 +176,16 @@ export default function ProviderDashboardPage() {
             <Button asChild variant="ghost" size="sm" className="hidden sm:flex">
               <Link href="/profile">Profile</Link>
             </Button>
-            <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
+            <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/provider/services">Services</Link>
             </Button>
-            <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
+            <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/messages">Messages</Link>
             </Button>
             <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/provider/customers">Customers</Link>
             </Button>
-            <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
+            <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/provider/bookings">Bookings</Link>
             </Button>
             <form action="/auth/logout" method="post">
