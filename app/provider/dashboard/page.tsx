@@ -207,9 +207,6 @@ export default function ProviderDashboardPage() {
               <Link href="/provider/services">Services</Link>
             </Button>
             <Button asChild variant="ghost" size="sm" className="hidden md:flex">
-              <Link href="/provider/customers">Customers</Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/provider/bookings">Bookings</Link>
             </Button>
             <LogoutButton className="text-xs md:text-sm" />
@@ -237,11 +234,6 @@ export default function ProviderDashboardPage() {
               <Button asChild variant="ghost" className="justify-start">
                 <Link href="/provider/services" onClick={() => setMobileMenuOpen(false)}>
                   My Services
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" className="justify-start">
-                <Link href="/provider/customers" onClick={() => setMobileMenuOpen(false)}>
-                  Customers
                 </Link>
               </Button>
               <Button asChild variant="ghost" className="justify-start">
