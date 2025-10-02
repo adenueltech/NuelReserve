@@ -122,7 +122,7 @@ export function BookingForm({ service, availability, userId }: BookingFormProps)
       {error && <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
 
       <Button onClick={handleBooking} disabled={isLoading || !selectedSlot} className="w-full">
-        {isLoading ? "Booking..." : `Book for $${service.price}`}
+        {isLoading ? "Booking..." : `Book for ${service.currency === 'NGN' ? '₦' : '$'}${service.price}`}
       </Button>
     </div>
   )

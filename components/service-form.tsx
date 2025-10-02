@@ -40,10 +40,10 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
     title: service?.title || "",
     description: service?.description || "",
     category: service?.category || "",
-    duration_value: service?.duration_minutes || 60,
-    duration_unit: "minutes" as "minutes" | "hours",
+    duration_value: service ? (service.duration_unit === "hours" ? service.duration_minutes / 60 : service.duration_minutes) : 1,
+    duration_unit: (service?.duration_unit as "minutes" | "hours") || "hours",
     price: service?.price || 0,
-    currency: "USD", // Default to USD
+    currency: service?.currency || "NGN",
     location: service?.location || "",
     is_active: service?.is_active ?? true,
   })
@@ -67,7 +67,9 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
             description: formData.description,
             category: formData.category,
             duration_minutes: durationMinutes,
+            duration_unit: formData.duration_unit,
             price: formData.price,
+            currency: formData.currency,
             location: formData.location,
             is_active: formData.is_active,
           })
@@ -82,7 +84,9 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
           description: formData.description,
           category: formData.category,
           duration_minutes: durationMinutes,
+          duration_unit: formData.duration_unit,
           price: formData.price,
+          currency: formData.currency,
           location: formData.location,
           is_active: formData.is_active,
         })
@@ -191,7 +195,7 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
               <Label htmlFor="currency">Currency *</Label>
               <Select
                 value={formData.currency}
-                onValueChange={(value) => setFormData({ ...formData, currency: value })}
+                onValueChange={(value) => setFormData({ ...formData, currency: value as "USD" | "NGN" })}
               >
                 <SelectTrigger id="currency">
                   <SelectValue />

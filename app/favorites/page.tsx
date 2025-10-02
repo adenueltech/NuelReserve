@@ -43,7 +43,9 @@ export default function FavoritesPage() {
         .from("services")
         .select(`
           *,
-          provider:profiles!services_provider_id_fkey(id, full_name, email)
+          provider:profiles(id, full_name, email),
+          currency,
+          duration_unit
         `)
         .in("id", favoriteServiceIds)
         .eq("is_active", true)

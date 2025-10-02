@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
-  const next = searchParams.get("next") ?? "/"
+  const next = searchParams.get("next") ?? "/auth/verify-email"
 
   if (code) {
     const supabase = await createClient()
@@ -23,6 +23,12 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // For local testing, redirect to verify-email even on error
+  const isLocalEnv = process.env.NODE_ENV === "development"
+  if (isLocalEnv) {
+    return NextResponse.redirect(`${origin}/auth/verify-email`)
+  }
+
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  return NextResponse.redirect(`${origin}/auth/error`)
 }

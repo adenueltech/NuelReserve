@@ -38,7 +38,9 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
       .select(
         `
         *,
-        provider:profiles(id, full_name, email, phone)
+        provider:profiles(id, full_name, email, phone),
+        currency,
+        duration_unit
       `,
       )
       .eq("id", paramId)
@@ -50,18 +52,24 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
     setServiceData(service)
 
     // Get available time slots for the next 30 days
-    const today = new Date().toISOString().split("T")[0]
+    const now = new Date()
+    const today = now.toISOString().split("T")[0]
+    const currentTime = now.toTimeString().slice(0, 8) // HH:MM:SS
     const futureDate = new Date()
     futureDate.setDate(futureDate.getDate() + 30)
     const future = futureDate.toISOString().split("T")[0]
 
-    const { data: availabilityData } = await supabase
-      .from("availabilityData")
+    let query = supabase
+      .from("availability")
       .select("*")
       .eq("service_id", paramId)
       .eq("is_booked", false)
       .gte("date", today)
       .lte("date", future)
+
+    // For today's slots, only show future times
+    const { data: availabilityData } = await query
+      .or(`date.gt.${today},and(date.eq.${today},start_time.gt.${currentTime})`)
       .order("date", { ascending: true })
       .order("start_time", { ascending: true })
 
@@ -127,11 +135,11 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                     <div className="flex-1">
                       <CardTitle className="text-2xl md:text-3xl">{serviceData.title}</CardTitle>
                       <CardDescription className="mt-2">
-                        Provided by {serviceData.provider?.full_name || "Unknown Provider"}
+                        Provided by {serviceData.provider?.full_name || serviceData.provider?.email || "Unknown Provider"}
                       </CardDescription>
                     </div>
                     <Badge variant="secondary" className="text-base md:text-lg self-start">
-                      ${serviceData.price}
+                      {serviceData.currency === 'NGN' ? '₦' : '$'}{serviceData.price}
                     </Badge>
                   </div>
                 </CardHeader>
@@ -148,7 +156,12 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ id: st
                     </div>
                     <div>
                       <h3 className="mb-2 font-semibold">Duration</h3>
-                      <p className="text-muted-foreground">{serviceData.duration_minutes} minutes</p>
+                      <p className="text-muted-foreground">
+                        {serviceData.duration_unit === 'hours'
+                          ? `${serviceData.duration_minutes / 60} hour${serviceData.duration_minutes / 60 !== 1 ? 's' : ''}`
+                          : `${serviceData.duration_minutes} min`
+                        }
+                      </p>
                     </div>
                     {serviceData.location && (
                       <div className="sm:col-span-2">

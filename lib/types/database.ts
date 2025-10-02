@@ -26,7 +26,9 @@ export interface Service {
   description: string | null
   category: string
   duration_minutes: number
+  duration_unit: "minutes" | "hours"
   price: number
+  currency: "USD" | "NGN"
   location: string | null
   is_active: boolean
   created_at: string

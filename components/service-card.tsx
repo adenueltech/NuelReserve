@@ -88,6 +88,8 @@ export function ServiceCard({ service, onFavoriteChange }: { service: ServiceWit
   }
 
 
+  console.log('service currency:', service.currency, 'duration_unit:', service.duration_unit, 'duration_minutes:', service.duration_minutes)
+
   return (
     <Card className="flex flex-col">
       <CardHeader>
@@ -110,10 +112,12 @@ export function ServiceCard({ service, onFavoriteChange }: { service: ServiceWit
                 }`}
               />
             </Button>
-            <Badge variant="secondary">${service.price}</Badge>
+            <Badge variant="secondary">
+              {service.currency === 'NGN' ? '₦' : '$'}{service.price}
+            </Badge>
           </div>
         </div>
-        <CardDescription>by {service.provider?.full_name || "Unknown Provider"}</CardDescription>
+        <CardDescription>by {service.provider?.full_name || service.provider?.email || "Unknown Provider"}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-4">
         <p className="line-clamp-2 text-sm text-muted-foreground">
@@ -121,7 +125,12 @@ export function ServiceCard({ service, onFavoriteChange }: { service: ServiceWit
         </p>
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline">{service.category}</Badge>
-          <Badge variant="outline">{service.duration_minutes} min</Badge>
+          <Badge variant="outline">
+            {service.duration_unit === 'hours'
+              ? `${service.duration_minutes / 60} hour${service.duration_minutes / 60 !== 1 ? 's' : ''}`
+              : `${service.duration_minutes} min`
+            }
+          </Badge>
         </div>
         {service.userHasBooking ? (
           <Button disabled className="mt-auto" variant="secondary">

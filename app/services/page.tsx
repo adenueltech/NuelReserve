@@ -37,7 +37,9 @@ export default function ServicesPage() {
         .select(
           `
           *,
-          provider:profiles!services_provider_id_fkey(id, full_name, email)
+          provider:profiles(id, full_name, email),
+          currency,
+          duration_unit
         `,
         )
         .eq("is_active", true)
