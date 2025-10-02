@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Block access to sensitive areas
+Disallow: /auth/
+Disallow: /provider/
+Disallow: /api/
+
+# Allow access to public content
+Allow: /services
+Allow: /get-started
+
+# Sitemap
+Sitemap: https://nuel-reserve.vercel.app/sitemap.xml

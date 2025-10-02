@@ -3,13 +3,25 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Zap } from "lucide-react"
+import Image from "next/image"
 
 export function HeroSection() {
   return (
-    <section
-      className="relative min-h-screen flex items-center overflow-hidden bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/hero.png')" }}
-    >
+    <section className="relative min-h-screen flex items-center overflow-hidden">
+      {/* Optimized Hero Image */}
+      <Image
+        src="/hero.png"
+        alt="Professional service booking platform - NuelReserve"
+        fill
+        className="object-cover object-center"
+        priority
+        quality={85}
+        sizes="100vw"
+        placeholder="blur"
+        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+IRjWjBqO6O2mhP//Z"
+        loading="eager"
+      />
+
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-black/40"></div>
 
