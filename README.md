@@ -6,7 +6,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1.9-blue)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> A comprehensive, feature-rich service booking platform connecting customers with trusted service providers through an intuitive, real-time experience.
+> A comprehensive, feature-rich service booking platform connecting customers with trusted service providers through an intuitive, real-time experience. All pricing is in USD for consistency.
 
 ## 📋 Table of Contents
 
@@ -82,10 +82,10 @@ NuelReserve revolutionizes service booking by providing a **comprehensive, intel
 
 #### For Service Providers
 - **📊 Analytics Dashboard**: Revenue tracking, booking trends, and KPIs
-- **👥 Customer Management**: Complete customer profiles and history
 - **📈 Performance Metrics**: Conversion rates and growth trends
 - **⚡ Automated Workflows**: Smart scheduling and reminder systems
-- **💰 Revenue Insights**: Detailed earnings reports and financial analytics
+- **💰 Revenue Insights**: Detailed earnings reports and financial analytics (USD)
+- **📅 Availability Management**: Easy time slot creation and management
 
 ### 🛠️ Technical Features
 
@@ -288,9 +288,9 @@ realtimeService.subscribeToBookingUpdates(providerId, callback)
 
 ### Provider Dashboard
 - **Analytics Overview**: Revenue charts and KPIs
-- **Customer Management**: Detailed client profiles and history
 - **Booking Management**: Status tracking and operations
 - **Performance Metrics**: Growth trends and insights
+- **Service Management**: Create and manage services with USD pricing
 
 ## 🤝 Contributing
 
