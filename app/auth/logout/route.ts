@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 
-export async function POST() {
+export async function POST(request: Request) {
   const supabase = await createClient()
 
   const { error } = await supabase.auth.signOut()
@@ -9,6 +9,9 @@ export async function POST() {
     console.error("Logout error:", error)
   }
 
+  // Get the origin from the request URL
+  const { origin } = new URL(request.url)
+
   // Redirect to login page with 303 to change POST to GET
-  return NextResponse.redirect(new URL("/auth/login", process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"), { status: 303 })
+  return NextResponse.redirect(new URL("/auth/login", origin), { status: 303 })
 }
