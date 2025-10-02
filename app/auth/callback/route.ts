@@ -9,7 +9,12 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
+
+    // Check if user is authenticated regardless of exchange error
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!error || user) {
+      // If no error or user is authenticated, redirect to success
       const forwardedHost = request.headers.get("x-forwarded-host") // original origin before load balancer
       const isLocalEnv = process.env.NODE_ENV === "development"
       if (isLocalEnv) {
