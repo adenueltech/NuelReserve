@@ -40,8 +40,10 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
     title: service?.title || "",
     description: service?.description || "",
     category: service?.category || "",
-    duration_minutes: service?.duration_minutes || 60,
+    duration_value: service?.duration_minutes || 60,
+    duration_unit: "minutes" as "minutes" | "hours",
     price: service?.price || 0,
+    currency: "USD", // Default to USD
     location: service?.location || "",
     is_active: service?.is_active ?? true,
   })
@@ -54,6 +56,8 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
     try {
       const supabase = createClient()
 
+      const durationMinutes = formData.duration_unit === "hours" ? formData.duration_value * 60 : formData.duration_value
+
       if (service) {
         // Update existing service
         const { error: updateError } = await supabase
@@ -62,7 +66,7 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
             title: formData.title,
             description: formData.description,
             category: formData.category,
-            duration_minutes: formData.duration_minutes,
+            duration_minutes: durationMinutes,
             price: formData.price,
             location: formData.location,
             is_active: formData.is_active,
@@ -77,7 +81,7 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
           title: formData.title,
           description: formData.description,
           category: formData.category,
-          duration_minutes: formData.duration_minutes,
+          duration_minutes: durationMinutes,
           price: formData.price,
           location: formData.location,
           is_active: formData.is_active,
@@ -142,22 +146,37 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="duration">Duration (minutes) *</Label>
-              <Input
-                id="duration"
-                type="number"
-                required
-                min="15"
-                step="15"
-                value={formData.duration_minutes}
-                onChange={(e) => setFormData({ ...formData, duration_minutes: Number.parseInt(e.target.value) })}
-              />
+              <Label htmlFor="duration">Duration *</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="duration"
+                  type="number"
+                  required
+                  min="1"
+                  step="1"
+                  value={formData.duration_value}
+                  onChange={(e) => setFormData({ ...formData, duration_value: Number.parseInt(e.target.value) })}
+                  className="flex-1"
+                />
+                <Select
+                  value={formData.duration_unit}
+                  onValueChange={(value: "minutes" | "hours") => setFormData({ ...formData, duration_unit: value })}
+                >
+                  <SelectTrigger className="w-24">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="minutes">min</SelectItem>
+                    <SelectItem value="hours">hours</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="price">Price ($) *</Label>
+              <Label htmlFor="price">Price *</Label>
               <Input
                 id="price"
                 type="number"
@@ -167,6 +186,21 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: Number.parseFloat(e.target.value) })}
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="currency">Currency *</Label>
+              <Select
+                value={formData.currency}
+                onValueChange={(value) => setFormData({ ...formData, currency: value })}
+              >
+                <SelectTrigger id="currency">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USD">$ USD</SelectItem>
+                  <SelectItem value="NGN">₦ NGN</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

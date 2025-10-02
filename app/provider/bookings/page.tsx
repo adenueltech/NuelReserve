@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
 import { BookingActions } from "@/components/booking-actions"
-import { MessageCircle } from "lucide-react"
 import type { Booking } from "@/lib/types/database"
 
 export default async function ProviderBookingsPage() {
@@ -31,8 +30,8 @@ export default async function ProviderBookingsPage() {
     .select(
       `
       *,
-      service:services!inner(id, title, category, duration_minutes),
-      user:profiles!bookings_user_id_fkey!inner(id, full_name, email, phone)
+      service:services(id, title, category, duration_minutes),
+      user:profiles!bookings_user_id_fkey(id, full_name, email, phone)
     `,
     )
     .eq("provider_id", user.id)
@@ -113,14 +112,8 @@ export default async function ProviderBookingsPage() {
         )}
 
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/messages?booking=${booking.id}`}>
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Message
-            </Link>
-          </Button>
-          <BookingActions booking={booking} />
-        </div>
+           <BookingActions booking={booking} />
+         </div>
       </CardContent>
     </Card>
   )

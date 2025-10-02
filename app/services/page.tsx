@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { ServiceCard } from "@/components/service-card"
 import { ServiceFilters } from "@/components/service-filters"
 import { NotificationBell } from "@/components/notification-bell"
+import { LogoutButton } from "@/components/logout-button"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
@@ -30,20 +31,39 @@ export default function ServicesPage() {
       }
       setUser(userData)
 
-      // Build query with ratings
+      // Build query
       let query = supabase
         .from("services")
         .select(
           `
           *,
-          provider:profiles!services_provider_id_fkey(id, full_name, email),
-          reviews!left(rating)
+          provider:profiles!services_provider_id_fkey(id, full_name, email)
         `,
         )
         .eq("is_active", true)
 
       const { data: servicesData } = await query.order("created_at", { ascending: false })
-      setServices(servicesData || [])
+
+      // Check for existing bookings for each service
+      const servicesWithBookingStatus = await Promise.all(
+        (servicesData || []).map(async (service) => {
+          const { data: existingBooking } = await supabase
+            .from("bookings")
+            .select("id")
+            .eq("user_id", userData.id)
+            .eq("service_id", service.id)
+            .in("status", ["pending", "confirmed", "completed"])
+            .limit(1)
+            .single()
+
+          return {
+            ...service,
+            userHasBooking: !!existingBooking
+          }
+        })
+      )
+
+      setServices(servicesWithBookingStatus)
     } catch (error) {
       console.error("Error loading services:", error)
     } finally {
@@ -75,9 +95,6 @@ export default function ServicesPage() {
           </Link>
           <div className="flex items-center gap-1 md:gap-4">
             <NotificationBell />
-            <Button asChild variant="ghost" size="sm" className="hidden sm:flex text-xs md:text-sm">
-              <Link href="/messages">Messages</Link>
-            </Button>
             <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/favorites">Favorites</Link>
             </Button>
@@ -87,11 +104,7 @@ export default function ServicesPage() {
             <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/bookings">Bookings</Link>
             </Button>
-            <form action="/auth/logout" method="post">
-              <Button type="submit" variant="outline" size="sm" className="text-xs md:text-sm">
-                Logout
-              </Button>
-            </form>
+            <LogoutButton className="text-xs md:text-sm" />
           </div>
 
           {/* Mobile Menu Button */}
@@ -109,11 +122,6 @@ export default function ServicesPage() {
           <div className="border-t border-border/40 bg-card/95 backdrop-blur-lg md:hidden">
             <nav className="container mx-auto flex flex-col gap-1 px-4 py-4">
               <Button asChild variant="ghost" className="justify-start">
-                <Link href="/messages" onClick={() => setMobileMenuOpen(false)}>
-                  Messages
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" className="justify-start">
                 <Link href="/favorites" onClick={() => setMobileMenuOpen(false)}>
                   Favorites
                 </Link>
@@ -129,11 +137,7 @@ export default function ServicesPage() {
                 </Link>
               </Button>
               <div className="mt-4 border-t border-border/40 pt-4">
-                <form action="/auth/logout" method="post">
-                  <Button type="submit" variant="outline" className="w-full">
-                    Logout
-                  </Button>
-                </form>
+                <LogoutButton className="w-full" />
               </div>
             </nav>
           </div>

@@ -131,11 +131,11 @@ export default async function BookingsPage({
                         <p className="text-sm text-muted-foreground">{booking.notes}</p>
                       </div>
                     )}
-                    {booking.status === "pending" && (
-                      <div className="mt-4">
+                    <div className="mt-4">
+                      {booking.status === "pending" && (
                         <CancelBookingButton bookingId={booking.id} />
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               ))

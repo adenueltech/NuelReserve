@@ -23,7 +23,7 @@ export default async function ProviderCustomersPage() {
     redirect("/services")
   }
 
-  // Get customers with booking history
+  // Get customers with booking history (only confirmed and completed bookings)
   const { data: customers } = await supabase
     .from("bookings")
     .select(`
@@ -35,6 +35,7 @@ export default async function ProviderCustomersPage() {
       created_at
     `)
     .eq("provider_id", user.id)
+    .in("status", ["confirmed", "completed"])
     .order("created_at", { ascending: false })
 
   // Group by customer

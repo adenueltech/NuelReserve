@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { AnalyticsCharts } from "@/components/analytics-charts"
-import { Menu, X } from "lucide-react"
+import { LogoutButton } from "@/components/logout-button"
+import { Menu, X, Trash2 } from "lucide-react"
 
 export default function ProviderDashboardPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -29,6 +30,31 @@ export default function ProviderDashboardPage() {
   useEffect(() => {
     loadDashboardData()
   }, [])
+
+  const deleteService = async (serviceId: string) => {
+    if (!window.confirm("Are you sure you want to delete this service? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from("services")
+        .delete()
+        .eq("id", serviceId)
+
+      if (error) {
+        console.error("Error deleting service:", error)
+        alert("Failed to delete service")
+        return
+      }
+
+      // Reload data
+      loadDashboardData()
+    } catch (error) {
+      console.error("Error deleting service:", error)
+      alert("Failed to delete service")
+    }
+  }
 
   const loadDashboardData = async () => {
     try {
@@ -131,6 +157,7 @@ export default function ProviderDashboardPage() {
         { name: 'Cancelled', value: statusCounts?.cancelled || 0, color: '#ef4444' },
       ].filter(item => item.value > 0)
 
+
       setData({
         profile: profileData,
         services: servicesData || [],
@@ -180,19 +207,12 @@ export default function ProviderDashboardPage() {
               <Link href="/provider/services">Services</Link>
             </Button>
             <Button asChild variant="ghost" size="sm" className="hidden md:flex">
-              <Link href="/messages">Messages</Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/provider/customers">Customers</Link>
             </Button>
             <Button asChild variant="ghost" size="sm" className="hidden md:flex">
               <Link href="/provider/bookings">Bookings</Link>
             </Button>
-            <form action="/auth/logout" method="post">
-              <Button type="submit" variant="outline" size="sm" className="text-xs md:text-sm">
-                Logout
-              </Button>
-            </form>
+            <LogoutButton className="text-xs md:text-sm" />
           </div>
 
           {/* Mobile Menu Button */}
@@ -220,11 +240,6 @@ export default function ProviderDashboardPage() {
                 </Link>
               </Button>
               <Button asChild variant="ghost" className="justify-start">
-                <Link href="/messages" onClick={() => setMobileMenuOpen(false)}>
-                  Messages
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" className="justify-start">
                 <Link href="/provider/customers" onClick={() => setMobileMenuOpen(false)}>
                   Customers
                 </Link>
@@ -235,11 +250,7 @@ export default function ProviderDashboardPage() {
                 </Link>
               </Button>
               <div className="mt-4 border-t border-border/40 pt-4">
-                <form action="/auth/logout" method="post">
-                  <Button type="submit" variant="outline" className="w-full">
-                    Logout
-                  </Button>
-                </form>
+                <LogoutButton />
               </div>
             </nav>
           </div>
@@ -323,6 +334,14 @@ export default function ProviderDashboardPage() {
                           </Badge>
                           <Button asChild size="sm" variant="outline">
                             <Link href={`/provider/services/${service.id}`}>Edit</Link>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteService(service.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>

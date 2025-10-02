@@ -26,15 +26,17 @@ export function HeroSection() {
             NuelReserve
           </h1>
 
-          {/* Subheading (straight text, no break) */}
+          {/* Subheading */}
           <p className="text-2xl md:text-4xl lg:text-5xl font-semibold text-white mb-6 leading-snug">
             Professional Service Booking Platform
           </p>
 
-          {/* Description */}
-          <p className="text-lg md:text-xl text-white/80 mb-6 max-w-2xl mx-auto md:mx-0 leading-relaxed font-bold">
-            Connect with trusted providers, book in real-time, and grow your business with confidence.
-          </p>
+          {/* Glassmorphism Description Box */}
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 md:p-8 shadow-lg mb-8 max-w-2xl mx-auto md:mx-0">
+            <p className="text-lg md:text-xl text-white/90 leading-relaxed font-light">
+              Connect with trusted providers, book in real-time, and grow your business with confidence.
+            </p>
+          </div>
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">

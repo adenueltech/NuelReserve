@@ -71,18 +71,6 @@ export interface BookingWithDetails extends Booking {
   provider: Profile
 }
 
-export interface Review {
-  id: string
-  user_id: string
-  service_id: string
-  provider_id: string
-  booking_id: string | null
-  rating: number
-  comment: string | null
-  created_at: string
-  updated_at: string
-}
-
 export interface Favorite {
   id: string
   user_id: string
@@ -90,7 +78,7 @@ export interface Favorite {
   created_at: string
 }
 
-export type NotificationType = "booking_request" | "booking_confirmed" | "booking_cancelled" | "booking_completed" | "review_received" | "payment_received" | "reminder"
+export type NotificationType = "booking_request" | "booking_confirmed" | "booking_cancelled" | "booking_completed" | "payment_received" | "reminder"
 
 export interface Notification {
   id: string
@@ -103,23 +91,3 @@ export interface Notification {
   created_at: string
 }
 
-export interface Message {
-  id: string
-  sender_id: string
-  receiver_id: string
-  booking_id: string | null
-  content: string
-  read: boolean
-  created_at: string
-}
-
-// Extended types with relations
-export interface ServiceWithRating extends Service {
-  provider: Profile
-  average_rating: number | null
-  review_count: number
-}
-
-export interface ReviewWithUser extends Review {
-  user: Profile
-}
