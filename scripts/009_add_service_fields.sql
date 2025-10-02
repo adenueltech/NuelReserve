@@ -10,5 +10,5 @@ where currency is null or duration_unit is null;
 
 -- Add check constraints
 alter table public.services
-add constraint valid_currency check (currency in ('USD', 'NGN')),
+add constraint valid_currency check (currency in ('USD')),
 add constraint valid_duration_unit check (duration_unit in ('minutes', 'hours'));

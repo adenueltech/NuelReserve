@@ -43,7 +43,7 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
     duration_value: service ? (service.duration_unit === "hours" ? service.duration_minutes / 60 : service.duration_minutes) : 1,
     duration_unit: (service?.duration_unit as "minutes" | "hours") || "hours",
     price: service?.price || 0,
-    currency: service?.currency || "NGN",
+    currency: service?.currency || "USD",
     location: service?.location || "",
     is_active: service?.is_active ?? true,
   })
@@ -195,14 +195,13 @@ export function ServiceForm({ providerId, service }: ServiceFormProps) {
               <Label htmlFor="currency">Currency *</Label>
               <Select
                 value={formData.currency}
-                onValueChange={(value) => setFormData({ ...formData, currency: value as "USD" | "NGN" })}
+                onValueChange={(value) => setFormData({ ...formData, currency: value as "USD" })}
               >
                 <SelectTrigger id="currency">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="USD">$ USD</SelectItem>
-                  <SelectItem value="NGN">₦ NGN</SelectItem>
                 </SelectContent>
               </Select>
             </div>
